@@ -1,0 +1,5 @@
+{
+  "html.format.wrapAttributes": "force-aligned",
+  "html.format.contentUnformatted": "",
+  "html.format.wrapLineLength": 10000
+}
