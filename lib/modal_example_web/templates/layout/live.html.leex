@@ -1,0 +1,15 @@
+<main role="main" class="container mx-auto mb-8 px-4 max-w-6xl">
+  <p class="alert alert-info" role="alert"
+    phx-click="lv:clear-flash"
+    phx-value-key="info"><%= live_flash(@flash, :info) %></p>
+
+  <p class="alert alert-danger" role="alert"
+    phx-click="lv:clear-flash"
+    phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+
+  <%= @inner_content %>
+</main>
+
+<%= if assigns[:live_action] in [:new, :edit] do %>
+  <div class="z-40 fixed bg-blue-900 top-0 left-0 bottom-0 right-0 opacity-75"></div>
+<% end %>
