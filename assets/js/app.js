@@ -12,6 +12,26 @@ import "alpinejs"
 
 const Hooks = {}
 
+Hooks.Modal = {
+  mounted() {
+    window.modalHook = this
+  },
+  destroyed() {
+    window.modalHook = null
+  },
+  removeModal(leave_duration) {
+    // Remove modal after delay to give transitions time to complete
+    setTimeout(() => {
+      var selector = '#' + this.el.id
+      if (document.querySelector(selector)) {
+        this.el.classList.add('hidden')
+        document.activeElement.blur()
+        this.pushEventTo(selector, 'remove-modal', {})
+      }
+    }, leave_duration + 10);
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content')
 let liveSocket = new LiveSocket('/live', Socket, {
   dom: {

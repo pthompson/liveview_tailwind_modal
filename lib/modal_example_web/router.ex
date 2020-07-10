@@ -18,6 +18,9 @@ defmodule ModalExampleWeb.Router do
     pipe_through :browser
 
     live "/", PageLive, :index
+
+    live "/team", TeamLive, :index
+    live "/team/:id/delete-member", TeamLive, :delete_member
   end
 
   if Mix.env() in [:dev, :test] do
