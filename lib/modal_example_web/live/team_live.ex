@@ -15,11 +15,11 @@ defmodule ModalExampleWeb.TeamLive do
   end
 
   @impl Phoenix.LiveView
-  @spec handle_params(any, any, Phoenix.LiveView.Socket.t()) :: {:noreply, any}
   def handle_params(params, _url, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  @spec apply_action(Socket.t(), atom(), map()) :: Socket.t()
   def apply_action(socket, :index, _params) do
     assign(socket, member_to_delete: nil, base_page_loaded: true)
   end
@@ -39,7 +39,7 @@ defmodule ModalExampleWeb.TeamLive do
     {:noreply, push_patch_delete_member_modal(socket, user_id)}
   end
 
-  # Handle message to self() from Remove User confirmation modal
+  # Handle message to self() from Remove Member confirmation modal ok button
   def handle_info(
         {ModalComponent, :button_pressed, %{action: "delete-member"}},
         %{assigns: %{member_to_delete: member_to_delete, team_members: team_members}} = socket
@@ -52,7 +52,7 @@ defmodule ModalExampleWeb.TeamLive do
      |> push_patch_index()}
   end
 
-  # Handle message to self() from Remove User confirmation modal
+  # Handle message to self() from Remove User confirmation modal cancel button
   def handle_info(
         {ModalComponent, :button_pressed, %{action: "cancel-delete-member", param: _}},
         socket
@@ -60,6 +60,7 @@ defmodule ModalExampleWeb.TeamLive do
     {:noreply, push_patch_index(socket)}
   end
 
+  # Modal closed message resulting from click-away or esc
   @impl Phoenix.LiveView
   def handle_info(
         {ModalComponent, :modal_closed, %{id: "confirm-delete-member"}},
@@ -148,8 +149,8 @@ defmodule ModalExampleWeb.TeamLive do
         user_id: 5,
         avatar:
           "https://images.unsplash.com/photo-1569779213435-ba3167dde7cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=256&q=80",
-        name: "Jon Robson",
-        email: "jonrobson@example.com",
+        name: "Juan Alvarez",
+        email: "juanalvarez@example.com",
         position: "Director",
         department: "Human Resources",
         status: "Inactive",

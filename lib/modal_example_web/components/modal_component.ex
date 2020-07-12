@@ -115,8 +115,6 @@ defmodule ModalExampleWeb.ModalComponent do
           }
         } = socket
       ) do
-    IO.puts("LEFT BUTTON CLICK")
-
     send_after(
       self(),
       {__MODULE__, :button_pressed, %{action: left_button_action, param: left_button_param}},
