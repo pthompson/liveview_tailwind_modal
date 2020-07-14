@@ -64,17 +64,15 @@
       </table>
     </div>
   </div>
-
-  <%= if @member_to_delete do %>
-  <%= live_component(@socket, ModalComponent,
-          id: "confirm-delete-member",
-          show: @live_action == :delete_member,
-          title: "Delete Member",
-          body: "Are you sure you want to delete team member '#{@member_to_delete.name}'?",
-          right_button: "Delete",
-          right_button_action: "delete-member",
-          left_button: "Cancel",
-          left_button_action: "cancel-delete-member")
-  %>
-  <% end %>
 </div>
+
+<%= live_component(@socket, ModalComponent,
+      id: "confirm-delete-member",
+      show: @live_action == :delete_member,
+      title: "Delete Member",
+      body: "Are you sure you want to delete team member '#{@member_to_delete && @member_to_delete.name || ""}'?",
+      right_button: "Delete",
+      right_button_action: "delete-member",
+      left_button: "Cancel",
+      left_button_action: "cancel-delete-member")
+%>

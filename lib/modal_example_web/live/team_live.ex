@@ -3,7 +3,7 @@ defmodule ModalExampleWeb.TeamLive do
   use ModalExampleWeb, :live_view
   alias ModalExampleWeb.ModalComponent
 
-  @impl true
+  @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     {:ok,
      assign(socket,
@@ -25,7 +25,11 @@ defmodule ModalExampleWeb.TeamLive do
   end
 
   def apply_action(socket, :delete_member, %{"id" => user_id}) do
-    member = get_member(socket.assigns.team_members, String.to_integer(user_id))
+    member =
+      get_member(
+        socket.assigns.team_members,
+        String.to_integer(user_id)
+      )
 
     if member && okay_to_show_modal?(socket) do
       assign(socket, member_to_delete: member)
@@ -48,8 +52,7 @@ defmodule ModalExampleWeb.TeamLive do
 
     {:noreply,
      socket
-     |> assign(team_members: team_members)
-     |> push_patch_index()}
+     |> assign(team_members: team_members)}
   end
 
   # Handle message to self() from Remove User confirmation modal cancel button
@@ -57,16 +60,22 @@ defmodule ModalExampleWeb.TeamLive do
         {ModalComponent, :button_pressed, %{action: "cancel-delete-member", param: _}},
         socket
       ) do
-    {:noreply, push_patch_index(socket)}
+    {:noreply, socket}
   end
 
-  # Modal closed message resulting from click-away or esc
+  # Modal closed message
   @impl Phoenix.LiveView
   def handle_info(
         {ModalComponent, :modal_closed, %{id: "confirm-delete-member"}},
         socket
       ) do
     {:noreply, push_patch_index(socket)}
+  end
+
+  defp okay_to_show_modal?(socket) do
+    %{assigns: %{base_page_loaded: base_page_loaded, reconnected: reconnected}} = socket
+
+    !connected?(socket) || base_page_loaded || reconnected
   end
 
   defp push_patch_index(socket) do
@@ -83,12 +92,6 @@ defmodule ModalExampleWeb.TeamLive do
       to: Routes.team_path(socket, :delete_member, user_id),
       replace: true
     )
-  end
-
-  defp okay_to_show_modal?(socket) do
-    %{assigns: %{base_page_loaded: base_page_loaded, reconnected: reconnected}} = socket
-
-    !connected?(socket) || base_page_loaded || reconnected
   end
 
   defp get_member(team_members, user_id) do
