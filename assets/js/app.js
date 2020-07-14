@@ -19,16 +19,14 @@ Hooks.Modal = {
   destroyed() {
     window.modalHook = null
   },
-  removeModal(leave_duration) {
-    // Remove modal after delay to give transitions time to complete
+  modalClosing(leaveDuration) {
+    // Inform modal component when leave transition completes.
     setTimeout(() => {
       var selector = '#' + this.el.id
       if (document.querySelector(selector)) {
-        this.el.classList.add('hidden')
-        document.activeElement.blur()
-        this.pushEventTo(selector, 'remove-modal', {})
+        this.pushEventTo(selector, 'modal-closed', {})
       }
-    }, leave_duration + 10);
+    }, leaveDuration);
   }
 }
 
