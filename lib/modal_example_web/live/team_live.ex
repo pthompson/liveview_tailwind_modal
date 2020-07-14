@@ -40,7 +40,7 @@ defmodule ModalExampleWeb.TeamLive do
 
   @impl Phoenix.LiveView
   def handle_event("delete-member", %{"user-id" => user_id}, socket) do
-    {:noreply, push_patch_delete_member_modal(socket, user_id)}
+    {:noreply, push_patch_delete_member_modal(socket, String.to_integer(user_id))}
   end
 
   # Handle message to self() from Remove Member confirmation modal ok button

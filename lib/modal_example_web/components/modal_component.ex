@@ -33,20 +33,16 @@ defmodule ModalExampleWeb.ModalComponent do
 
   The component can be called like:
 
-  <div id="confirm-book-removal">
-    <%= live_component(@socket, ModalComponent,
-              id: "confirm-heading-removal",
-              show: @item_to_remove != nil,
-              title: "Remove Heading",
-              body: "Are you sure you want to remove the heading'",
-              right_button: "Remove",
-              right_button_action: "remove-item-confirmed",
-              right_button_param: @item_to_remove.display_order,
-              left_button: "Cancel",
-              left_button_action: "cancel-remove-item")
-            %>
-    <% end %>
-  </div>
+  <%= live_component(@socket, ModalComponent,
+      id: "confirm-delete-member",
+      show: @live_action == :delete_member,
+      title: "Delete Member",
+      body: "Are you sure you want to delete team member?",
+      right_button: "Delete",
+      right_button_action: "delete-member",
+      left_button: "Cancel",
+      left_button_action: "cancel-delete-member")
+  %>
   """
 
   use ModalExampleWeb, :live_component
@@ -75,7 +71,7 @@ defmodule ModalExampleWeb.ModalComponent do
   end
 
   @impl Phoenix.LiveComponent
-  def handle_event("remove-modal", _params, socket) do
+  def handle_event("modal-closed", _params, socket) do
     # Handle event fired from Modal hook leave_duration-milliseconds
     # afer open transitions to false.
     send(self(), {__MODULE__, :modal_closed, %{id: socket.assigns.id}})
@@ -95,11 +91,12 @@ defmodule ModalExampleWeb.ModalComponent do
           }
         } = socket
       ) do
-    send_after(
+    send(
       self(),
-      {__MODULE__, :button_pressed, %{action: right_button_action, param: right_button_param}},
-      leave_duration
+      {__MODULE__, :button_pressed, %{action: right_button_action, param: right_button_param}}
     )
+
+    send_after(self(), {__MODULE__, :modal_closed, %{id: socket.assigns.id}}, leave_duration)
 
     {:noreply, socket}
   end
@@ -115,11 +112,12 @@ defmodule ModalExampleWeb.ModalComponent do
           }
         } = socket
       ) do
-    send_after(
+    send(
       self(),
-      {__MODULE__, :button_pressed, %{action: left_button_action, param: left_button_param}},
-      leave_duration
+      {__MODULE__, :button_pressed, %{action: left_button_action, param: left_button_param}}
     )
+
+    send_after(self(), {__MODULE__, :modal_closed, %{id: socket.assigns.id}}, leave_duration)
 
     {:noreply, socket}
   end
@@ -128,44 +126,44 @@ defmodule ModalExampleWeb.ModalComponent do
   def render(%{show: true} = assigns) do
     ~L"""
     <div id="<%= @id %>"
-          phx-hook="Modal"
-          x-data="{ open: false }"
-          x-init="() => {
-            setTimeout(() => open = true, 0)
-            $nextTick(() => $refs.modalRightButton.focus())
-            $watch('open', isOpen => {
-              if (!isOpen) {
-                modalHook.removeModal(<%= @leave_duration %>)
-              }
-            })
-          }"
-          @keydown.escape.window="open = false"
-          x-show="open">
+         phx-hook="Modal"
+         x-data="{ open: false }"
+         x-init="() => {
+           setTimeout(() => open = true, 0)
+           $nextTick(() => $refs.modalRightButton.focus())
+           $watch('open', isOpen => {
+             if (!isOpen) {
+               modalHook.modalClosing(<%= @leave_duration %>)
+             }
+           })
+         }"
+         @keydown.escape.window="open = false"
+         x-show="open">
       <div class="z-50 fixed bottom-0 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center">
         <!-- BACKDROP -->
         <div x-show="open"
-              x-transition:enter="ease-out duration-<%= @enter_duration %>"
-              x-transition:enter-start="opacity-0"
-              x-transition:enter-end="opacity-100"
-              x-transition:leave="ease-in duration-<%= @leave_duration %>"
-              x-transition:leave-start="opacity-100"
-              x-transition:leave-end="opacity-0"
-              class="fixed inset-0 transition-opacity">
+             x-transition:enter="ease-out duration-<%= @enter_duration %>"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-<%= @leave_duration %>"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 transition-opacity">
           <div class="absolute inset-0 <%= @background_color %> <%= @background_opacity %>"></div>
         </div>
         <div x-show="open"
-              @click.away="open = false"
-              x-transition:enter="ease-out duration-<%= @enter_duration %>"
-              x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-              x-transition:leave="ease-in duration-<%= @leave_duration %>"
-              x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-              x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="modal-headline"
-              aria-describedby="modal-description">
+             @click.away="open = false"
+             x-transition:enter="ease-out duration-<%= @enter_duration %>"
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave="ease-in duration-<%= @leave_duration %>"
+             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="modal-headline"
+             aria-describedby="modal-description">
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="sm:flex sm:items-start">
               <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -186,7 +184,7 @@ defmodule ModalExampleWeb.ModalComponent do
                 </h3>
                 <div class="mt-2">
                   <p class="text-sm leading-5 <%= @body_color %>"
-                  id="modal-description">
+                     id="modal-description">
                     <%= @body %>
                   </p>
                 </div>
