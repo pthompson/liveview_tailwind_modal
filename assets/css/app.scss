@@ -1,24 +1,8 @@
 @tailwind base;
 @tailwind components;
 
-.alert:empty {
-  @apply hidden;
-}
-
-.alert {
-  @apply relative py-3 px-5 mb-4 border border-transparent rounded;
-
-  &.alert-info {
-    @apply bg-blue-700 border-blue-800 text-white;
-  }
-
-  &.alert-success {
-    @apply bg-green-700 border-green-800 text-white;
-  }
-
-  &.alert-danger {
-    @apply bg-red-700 border-red-800 text-white;
-  }
+[x-cloak] {
+  display: none;
 }
 
 @tailwind utilities;
