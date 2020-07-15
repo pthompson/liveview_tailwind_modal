@@ -137,7 +137,7 @@ defmodule ModalExampleWeb.ModalComponent do
                  }
                })
              }"
-         @keydown.escape.window="open = false"
+         @keydown.escape.window="if (connected) open = false"
          x-show="open"
          x-cloak>
       <div class="z-50 fixed bottom-0 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center">
@@ -155,7 +155,7 @@ defmodule ModalExampleWeb.ModalComponent do
         </div>
         <div x-show="open"
              x-cloak
-             @click.away="open = false"
+             @click.away="if (connected) open = false"
              x-transition:enter="ease-out duration-<%= @enter_duration %>"
              x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
@@ -201,7 +201,7 @@ defmodule ModalExampleWeb.ModalComponent do
                       phx-target="#<%= @id %>"
                       class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-<%= @right_button_color     %>-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-<%= @right_button_color %>-500 focus:outline-none     focus:border-<%= @right_button_color %>-700 focus:shadow-outline-<%= @right_button_color %> transition ease-in-out     duration-150 sm:text-sm sm:leading-5"
                       x-ref="modalRightButton"
-                      @click="open = false">
+                      @click="if (connected) open = false">
                 <%= @right_button %>
               </button>
             </span>
@@ -211,7 +211,7 @@ defmodule ModalExampleWeb.ModalComponent do
                       phx-click="left-button-click"
                       phx-target="#<%= @id %>"
                       class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6     font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300     focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                      @click="open = false">
+                      @click="if (connected) open = false">
                 <%= @left_button %>
               </button>
             </span>
@@ -220,6 +220,8 @@ defmodule ModalExampleWeb.ModalComponent do
         </div>
       </div>
     </div>
+
+    <template phx-hook="ConnectionStatus"></template>
     """
   end
 end
