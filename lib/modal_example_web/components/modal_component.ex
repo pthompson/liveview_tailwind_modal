@@ -76,7 +76,7 @@ defmodule ModalExampleWeb.ModalComponent do
     # afer open transitions to false.
     send(self(), {__MODULE__, :modal_closed, %{id: socket.assigns.id}})
 
-    {:noreply, assign(socket, show: false)}
+    {:noreply, socket}
   end
 
   # Fired when user clicks right button on modal
@@ -123,25 +123,27 @@ defmodule ModalExampleWeb.ModalComponent do
   end
 
   @impl Phoenix.LiveComponent
-  def render(%{show: true} = assigns) do
+  def render(assigns) do
     ~L"""
     <div id="<%= @id %>"
          phx-hook="Modal"
-         x-data="{ open: false }"
+         x-data="{ open: <%= @show %> }"
          x-init="() => {
-           setTimeout(() => open = true, 0)
-           $nextTick(() => $refs.modalRightButton.focus())
-           $watch('open', isOpen => {
-             if (!isOpen) {
-               modalHook.modalClosing(<%= @leave_duration %>)
-             }
-           })
-         }"
+               $nextTick(() => $refs.modalRightButton.focus())
+               $watch('open', isOpen => {
+                 console.log('WATCH OPEN = ' + isOpen)
+                 if (!isOpen) {
+                   modalHook.modalClosing(<%= @leave_duration %>)
+                 }
+               })
+             }"
          @keydown.escape.window="open = false"
-         x-show="open">
+         x-show="open"
+         x-cloak>
       <div class="z-50 fixed bottom-0 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center">
         <!-- BACKDROP -->
         <div x-show="open"
+             x-cloak
              x-transition:enter="ease-out duration-<%= @enter_duration %>"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
@@ -152,6 +154,7 @@ defmodule ModalExampleWeb.ModalComponent do
           <div class="absolute inset-0 <%= @background_color %> <%= @background_opacity %>"></div>
         </div>
         <div x-show="open"
+             x-cloak
              @click.away="open = false"
              x-transition:enter="ease-out duration-<%= @enter_duration %>"
              x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
@@ -180,8 +183,8 @@ defmodule ModalExampleWeb.ModalComponent do
               <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                 <h3 class="text-lg leading-6 font-medium <%= @title_color %>"
                     id="modal-headline">
-                  <%= @title %>
-                </h3>
+                      <%= @title %>
+                    </h3>
                 <div class="mt-2">
                   <p class="text-sm leading-5 <%= @body_color %>"
                      id="modal-description">
@@ -196,7 +199,7 @@ defmodule ModalExampleWeb.ModalComponent do
               <button type="button"
                       phx-click="right-button-click"
                       phx-target="#<%= @id %>"
-                      class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-<%= @right_button_color %>-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-<%= @right_button_color %>-500 focus:outline-none focus:border-<%= @right_button_color %>-700 focus:shadow-outline-<%= @right_button_color %> transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+                      class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-<%= @right_button_color     %>-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-<%= @right_button_color %>-500 focus:outline-none     focus:border-<%= @right_button_color %>-700 focus:shadow-outline-<%= @right_button_color %> transition ease-in-out     duration-150 sm:text-sm sm:leading-5"
                       x-ref="modalRightButton"
                       @click="open = false">
                 <%= @right_button %>
@@ -207,7 +210,7 @@ defmodule ModalExampleWeb.ModalComponent do
               <button type="button"
                       phx-click="left-button-click"
                       phx-target="#<%= @id %>"
-                      class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+                      class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6     font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300     focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
                       @click="open = false">
                 <%= @left_button %>
               </button>
@@ -217,12 +220,6 @@ defmodule ModalExampleWeb.ModalComponent do
         </div>
       </div>
     </div>
-    """
-  end
-
-  def render(assigns) do
-    ~L"""
-    <div class="hidden"></div>
     """
   end
 end
