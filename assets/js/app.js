@@ -30,6 +30,18 @@ Hooks.Modal = {
   }
 }
 
+Hooks.ConnectionStatus = {
+  mounted() {
+    window.connected = true
+  },
+  disconnected() {
+    window.connected = false
+  },
+  reconnected() {
+    window.connected = true
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content')
 let liveSocket = new LiveSocket('/live', Socket, {
   dom: {

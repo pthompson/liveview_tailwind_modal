@@ -1,8 +1,10 @@
 @tailwind base;
-@tailwind components;
 
 [x-cloak] {
   display: none;
 }
 
+@import "./live_view.css";
+
+@tailwind components;
 @tailwind utilities;
