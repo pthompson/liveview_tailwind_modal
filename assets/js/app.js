@@ -12,6 +12,24 @@ import "alpinejs"
 
 const Hooks = {}
 
+Hooks.Modal = {
+  mounted() {
+    window.modalHook = this
+  },
+  destroyed() {
+    window.modalHook = null
+  },
+  modalClosing(leaveDuration) {
+    // Inform modal component when leave transition completes.
+    setTimeout(() => {
+      var selector = '#' + this.el.id
+      if (document.querySelector(selector)) {
+        this.pushEventTo(selector, 'modal-closed', {})
+      }
+    }, leaveDuration);
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content')
 let liveSocket = new LiveSocket('/live', Socket, {
   dom: {
