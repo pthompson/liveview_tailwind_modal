@@ -131,7 +131,6 @@ defmodule ModalExampleWeb.ModalComponent do
          x-init="() => {
                $nextTick(() => $refs.modalRightButton.focus())
                $watch('open', isOpen => {
-                 console.log('WATCH OPEN = ' + isOpen)
                  if (!isOpen) {
                    modalHook.modalClosing(<%= @leave_duration %>)
                  }
