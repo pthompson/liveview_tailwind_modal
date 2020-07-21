@@ -223,7 +223,7 @@ defmodule ModalExampleWeb.ModalComponentAlternate do
     </div>
     <template phx-hook="ConnectionStatus"></template>
     <% else %>
-      <div class="hidden"></div>
+    <div class="hidden"></div>
     <% end %>
     """
   end
