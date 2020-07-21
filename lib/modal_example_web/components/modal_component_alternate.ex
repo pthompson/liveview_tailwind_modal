@@ -123,8 +123,9 @@ defmodule ModalExampleWeb.ModalComponentAlternate do
   end
 
   @impl Phoenix.LiveComponent
-  def render(%{show: true} = assigns) do
+  def render(assigns) do
     ~L"""
+    <%= if @show do %>
     <div id="<%= @id %>"
          phx-hook="Modal"
          x-data="{ open: false }"
@@ -221,12 +222,9 @@ defmodule ModalExampleWeb.ModalComponentAlternate do
       </div>
     </div>
     <template phx-hook="ConnectionStatus"></template>
-    """
-  end
-
-  def render(assigns) do
-    ~L"""
+    <% else %>
     <div class="hidden"></div>
+    <% end %>
     """
   end
 end
