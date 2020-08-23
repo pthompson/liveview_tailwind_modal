@@ -52,7 +52,8 @@ defmodule ModalExampleWeb.TeamLive do
 
     {:noreply,
      socket
-     |> assign(team_members: team_members)}
+     |> assign(team_members: team_members)
+     |> put_flash_notice(:info, "Team member '#{member_to_delete.name}' has been deleted.")}
   end
 
   # Handle message to self() from Remove User confirmation modal cancel button
