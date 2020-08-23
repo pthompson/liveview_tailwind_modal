@@ -72,7 +72,7 @@ Hooks.Flash = {
   }
 }
 
-Hooks.NoticeAlert = {
+Hooks.FlashNotice = {
   mounted() {
     this.handleEvent('show-flash-notice', ({
       kind,
