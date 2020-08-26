@@ -42,7 +42,57 @@ Hooks.ConnectionStatus = {
   }
 }
 
+Hooks.Flash = {
+  mounted() {
+    window.flashHook = this
+    this.closeTimeoutId = null
+  },
+  destroyed() {
+    window.flashHook = null
+  },
+  flashOpened(key, timeout) {
+    this.clearCloseFlashTimeout()
+    if (key && timeout > 0) {
+      this.closeTimeoutId = setTimeout(() => this.closeFlash(key), timeout)
+    }
+  },
+  closeFlash(key) {
+    this.clearCloseFlashTimeout()
+    if (key) {
+      this.pushEvent("lv:clear-flash", {
+        key: key
+      })
+    }
+  },
+  clearCloseFlashTimeout() {
+    if (this.closeTimeoutId != null) {
+      clearTimeout(this.closeTimeoutId)
+      this.closeTimeoutId = null
+    }
+  }
+}
+
+Hooks.FlashNotice = {
+  mounted() {
+    this.handleEvent('show-flash-notice', ({
+      kind,
+      message
+    }) => {
+      let timeout = kind === 'info' ? 10000 : 0
+      event = new CustomEvent('flash-notice', {
+        detail: {
+          kind: kind,
+          message: message,
+          timeout: timeout
+        }
+      })
+      this.el.dispatchEvent(event)
+    })
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content')
+
 let liveSocket = new LiveSocket('/live', Socket, {
   dom: {
     onBeforeElUpdated(from, to) {

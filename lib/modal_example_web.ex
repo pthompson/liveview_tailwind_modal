@@ -87,6 +87,7 @@ defmodule ModalExampleWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
+      import ModalExampleWeb.LiveViewHelpers
       import ModalExampleWeb.ErrorHelpers
       import ModalExampleWeb.Gettext
       alias ModalExampleWeb.Router.Helpers, as: Routes

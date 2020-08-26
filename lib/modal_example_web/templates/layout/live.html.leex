@@ -1,15 +1,151 @@
-<main role="main" class="container mx-auto mb-8 px-4 max-w-6xl">
-  <p class="alert alert-info" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="info"><%= live_flash(@flash, :info) %></p>
+<main role="main"
+      class="container">
+  <%= if Phoenix.LiveView.connected?(@socket) do %>
+  <%= for {type, {color, timeout}} <- [error: {"red", 0}, info: {"blue", 10000}] do %>
+  <div class="sticky top-0 z-50">
+    <div id="flash-<%= type %>"
+         class="flex justify-between items-center h-16 mb-6 max-w-full w-full px-6 py-3
+         text-white text-sm font-bold shadow-md bg-<%= color %>-700"
+         role="alert"
+         x-data="{show: <%= !!live_flash(@flash, type) %>, type: '<%= type %>', timeout: <%= timeout %>}"
+         x-init="() => {
+           if (show) {
+             flashHook.flashOpened(type, timeout)
+           }
+           $watch('show', isShowing => {
+             if (isShowing) {
+               flashHook.flashOpened(type, timeout)
+             }
+           })
+         }"
+         x-cloak
+         x-show="show"
+         role="alert"
+         x-transition:leave="transition transform ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95"
+         phx-hook="Flash">
+      <div class="flex items-center">
+        <template x-if="type === 'info'">
+          <svg class="stroke-current w-6 h-6 mr-3"
+               viewBox="0 0 32 32">
+            <path fill="none"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  stroke-miterlimit="4"
+                  stroke-width="2.6667"
+                  d="M17.333 21.333h-1.333v-5.333h-1.333M16 10.667h0.013M28 16c0 6.627-5.373 12-12 12s-12-5.373-12-12c0-6.627 5.373-12 12-12s12 5.373 12 12z"></path>
+          </svg>
+        </template>
+        <template x-if="type === 'error'">
+          <svg class="stroke-current w-6 h-6 mr-3"
+               viewBox="0 0 32 32">
+            <path fill="none"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  stroke-miterlimit="4"
+                  stroke-width="2.6667"
+                  d="M16 12v2.667M16 20h0.013M6.762 25.333h18.475c2.053 0 3.336-2.222 2.309-4l-9.238-16c-1.026-1.778-3.592-1.778-4.619 0l-9.238 16c-1.026 1.778 0.257 4 2.309 4z"></path>
+          </svg>
+        </template>
+        <p>
+          <%= live_flash(@flash, type) %>
+        </p>
+      </div>
+      <div class="ml-auto pl-3">
+        <div class="-mx-1.5 -my-1.5">
+          <button class="inline-flex rounded-md p-1.5 text-white hover:bg-<%= color %>-500 focus:bg-<%= color %>-500 focus:outline-none transition ease-in-out duration-150"
+                  @click="show = false"
+                  type="button"
+                  aria-label="Dismiss">
+            <svg class="h-5 w-5"
+                 viewBox="0 0 20 20"
+                 fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
+  <% end %>
 
-  <p class="alert alert-danger" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+  <%= if Phoenix.LiveView.connected?(@socket) do %>
+  <div class="sticky top-0 z-50">
+    <div id="flash-notice"
+         class="flex justify-between items-center h-16 mb-6 max-w-full w-full px-6 py-3
+                text-white text-sm font-bold shadow-md"
+         x-data="{show: false, timeout: 0, message: null, type: null}"
+         x-bind:class="{ 'bg-red-700': type === 'error', 'bg-blue-700': type === 'info' }"
+         x-on:flash-notice="
+             show=true
+             type = $event.detail.kind
+             message = $event.detail.message
+             if ($event.detail.timeout > 0) {
+               setTimeout(() => {
+                 show = false
+               }, $event.detail.timeout)
+             }
+           "
+         x-show="show"
+         x-cloak
+         role="alert"
+         phx-hook="FlashNotice"
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="opacity-0 transform scale-95"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95">
+      <div class="flex items-center">
+        <template x-if="type === 'info'">
+          <svg class="stroke-current w-6 h-6 mr-3"
+               viewBox="0 0 32 32">
+            <path fill="none"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  stroke-miterlimit="4"
+                  stroke-width="2.6667"
+                  d="M17.333 21.333h-1.333v-5.333h-1.333M16 10.667h0.013M28 16c0 6.627-5.373 12-12 12s-12-5.373-12-12c0-6.627 5.373-12 12-12s12 5.373 12 12z"></path>
+          </svg>
+        </template>
+        <template x-if="type === 'error'">
+          <svg class="stroke-current w-6 h-6 mr-3"
+               viewBox="0 0 32 32">
+            <path fill="none"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  stroke-miterlimit="4"
+                  stroke-width="2.6667"
+                  d="M16 12v2.667M16 20h0.013M6.762 25.333h18.475c2.053 0 3.336-2.222 2.309-4l-9.238-16c-1.026-1.778-3.592-1.778-4.619 0l-9.238 16c-1.026 1.778 0.257 4 2.309 4z"></path>
+          </svg>
+        </template>
+        <p x-text="message">
+        </p>
+      </div>
+      <div class="ml-auto pl-3">
+        <div class="-mx-1.5 -my-1.5">
+          <button class="inline-flex rounded-md p-1.5 text-white focus:outline-none transition ease-in-out duration-150"
+                  @click="show = false"
+                  x-bind:class="{ 'hover:bg-red-500 focus:bg-red-500': type === 'error', 'hover:bg-blue-500 focus:bg-blue-500': type === 'info' }"
+                  type="button"
+                  aria-label="Dismiss">
+            <svg class="h-5 w-5"
+                 viewBox="0 0 20 20"
+                 fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
 
   <%= @inner_content %>
 </main>
-
-<%= if assigns[:live_action] in [:new, :edit] do %>
-  <div class="z-40 fixed bg-blue-900 top-0 left-0 bottom-0 right-0 opacity-75"></div>
-<% end %>
