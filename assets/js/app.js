@@ -51,13 +51,13 @@ Hooks.Flash = {
     window.flashHook = null
   },
   flashOpened(key, timeout) {
-    clearCloseFlashTimeout()
+    this.clearCloseFlashTimeout()
     if (key && timeout > 0) {
       this.closeTimeoutId = setTimeout(() => this.closeFlash(key), timeout)
     }
   },
   closeFlash(key) {
-    clearCloseFlashTimeout()
+    this.clearCloseFlashTimeout()
     if (key) {
       this.pushEvent("lv:clear-flash", {
         key: key
@@ -78,10 +78,7 @@ Hooks.FlashNotice = {
       kind,
       message
     }) => {
-      let timeout = 0
-      if (kind == 'info') {
-        timeout = 10000
-      }
+      let timeout = kind === 'info' ? 10000 : 0
       event = new CustomEvent('flash-notice', {
         detail: {
           kind: kind,
@@ -95,6 +92,7 @@ Hooks.FlashNotice = {
 }
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content')
+
 let liveSocket = new LiveSocket('/live', Socket, {
   dom: {
     onBeforeElUpdated(from, to) {
