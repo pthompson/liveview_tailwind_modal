@@ -142,7 +142,6 @@ defmodule ModalExampleWeb.ModalComponent do
       <div class="z-50 fixed bottom-0 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center">
         <!-- BACKDROP -->
         <div x-show="open"
-             x-cloak
              x-transition:enter="ease-out duration-<%= @enter_duration %>"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
@@ -153,7 +152,6 @@ defmodule ModalExampleWeb.ModalComponent do
           <div class="absolute inset-0 <%= @background_color %> <%= @background_opacity %>"></div>
         </div>
         <div x-show="open"
-             x-cloak
              @click.away="if (connected) open = false"
              x-transition:enter="ease-out duration-<%= @enter_duration %>"
              x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
