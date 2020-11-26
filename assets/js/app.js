@@ -1,70 +1,79 @@
-import "../css/app.scss"
+import '../css/app.scss'
 
-import "phoenix_html"
-import {
-  Socket
-} from "phoenix"
-import NProgress from "nprogress"
-import {
-  LiveSocket
-} from "phoenix_live_view"
-import "alpinejs"
+import 'phoenix_html'
+import { Socket } from 'phoenix'
+import NProgress from 'nprogress'
+import { LiveSocket } from 'phoenix_live_view'
+import 'alpinejs'
+
+window.Alpine.addMagicProperty('phx', function (componentEl) {
+  let phxEl = componentEl.closest('[data-phx-view]')
+
+  if (!phxEl)
+    console.warn(
+      'Alpine: Cannot reference "$phx" outside a Phoenix LiveView component.'
+    )
+
+  let view = liveSocket.getViewByEl(phxEl)
+
+  return view
+})
 
 const Hooks = {}
 
 Hooks.Modal = {
-  mounted() {
+  mounted () {
     window.modalHook = this
   },
-  destroyed() {
+  destroyed () {
     window.modalHook = null
   },
-  modalClosing(leaveDuration) {
+  modalClosing (leaveDuration) {
     // Inform modal component when leave transition completes.
     setTimeout(() => {
       var selector = '#' + this.el.id
       if (document.querySelector(selector)) {
         this.pushEventTo(selector, 'modal-closed', {})
       }
-    }, leaveDuration);
+    }, leaveDuration)
   }
 }
 
 Hooks.ConnectionStatus = {
-  mounted() {
+  mounted () {
     window.connected = true
   },
-  disconnected() {
+  disconnected () {
     window.connected = false
   },
-  reconnected() {
+  reconnected () {
     window.connected = true
   }
 }
 
 Hooks.Flash = {
-  mounted() {
+  mounted () {
     window.flashHook = this
     this.closeTimeoutId = null
   },
-  destroyed() {
+  destroyed () {
     window.flashHook = null
   },
-  flashOpened(key, timeout) {
+  flashOpened (key, timeout) {
     this.clearCloseFlashTimeout()
     if (key && timeout > 0) {
       this.closeTimeoutId = setTimeout(() => this.closeFlash(key), timeout)
     }
   },
-  closeFlash(key) {
+  closeFlash (key) {
     this.clearCloseFlashTimeout()
     if (key) {
-      this.pushEvent("lv:clear-flash", {
+      this.pushEvent('lv:clear-flash', {
         key: key
       })
     }
   },
-  clearCloseFlashTimeout() {
+  clearCloseFlashTimeout () {
     if (this.closeTimeoutId != null) {
       clearTimeout(this.closeTimeoutId)
       this.closeTimeoutId = null
@@ -73,11 +82,8 @@ Hooks.Flash = {
 }
 
 Hooks.FlashNotice = {
-  mounted() {
-    this.handleEvent('show-flash-notice', ({
-      kind,
-      message
-    }) => {
+  mounted () {
+    this.handleEvent('show-flash-notice', ({ kind, message }) => {
       let timeout = kind === 'info' ? 10000 : 0
       event = new CustomEvent('flash-notice', {
         detail: {
@@ -91,11 +97,13 @@ Hooks.FlashNotice = {
   }
 }
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content')
+let csrfToken = document
+  .querySelector("meta[name='csrf-token']")
+  .getAttribute('content')
 
 let liveSocket = new LiveSocket('/live', Socket, {
   dom: {
-    onBeforeElUpdated(from, to) {
+    onBeforeElUpdated (from, to) {
       if (from.__x) {
         window.Alpine.clone(from.__x, to)
       }
@@ -108,8 +116,8 @@ let liveSocket = new LiveSocket('/live', Socket, {
 })
 
 // Show progress bar on live navigation and form submits
-window.addEventListener("phx:page-loading-start", info => NProgress.start())
-window.addEventListener("phx:page-loading-stop", info => NProgress.done())
+window.addEventListener('phx:page-loading-start', info => NProgress.start())
+window.addEventListener('phx:page-loading-stop', info => NProgress.done())
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()
